@@ -20,43 +20,39 @@ class DB_Handler():
         except:
             return -1
 
+    def getAvailableID(self):
+        query="select ID from FIELD where 1"
+        self.cursor.execute(query)
+        ids = self.cursor.fetchall()
+
+        ids_=[]
+        for p in ids:
+            ids_.append(p[0])
+        i=1
+        while i in ids_:
+            i+=1
+
+        return i
+
     def getRegisters(self):
         query="select * from FIELD where 1;"
         self.cursor.execute(query)
         return self.cursor.fetchall()
 
     def addRegister(self, *arg):
-        if len(arg) != 6:
+        if len(arg) != 5:
             return -1
-        query="insert into FIELD (id, field1, field2, field3, field4, field5) values (1,'WORKING','WORKING','WORKING','WORKING','WORKING')"
+        values = "("+str(self.getAvailableID())+",\""+arg[0]+"\",\""+arg[1]+"\",\""+arg[2]+"\",\""+arg[3]+"\",\""+arg[4]+"\");"
+        query="insert into FIELD (id, field1, field2, field3, field4, field5) values "+values
         self.cursor.execute(query)
         self.connect.commit()
 
-# DB = DB_Handler()
-# print(DB.openDB(host='localhost', user='antonio', passwd='antonio', db='ejercicioDB'))
+    def remove(self, index):
+        query = "delete from FIELD where id="+str(index)+";"
+        self.cursor.execute(query)
+        self.connect.commit()
 
-
-connect = MySQLdb.connect(host='localhost', user='antonio', passwd='antonio', db='GUI')
-
-
-
-
-# def id_valido(cursor):
-#     query="select id from Victimas where 1;"
-#     cursor.execute(query)
-#     return cursor.rowcount+1
-
-
-# #Establecemos la conexión con la base de datos 'ejercicioDB'
-# connect = MySQLdb.connect(host='localhost', user='antonio', passwd='antonio', db='ejercicioDB')
-
-# #Creamos el cursor.
-# cursor = connect.cursor()
-
-# #Añadimos a la base de datos los primeros 10 registros.
-# query="insert into Victimas (id,Nombre,Profesion,Muerte) values (1, \"Fenix\",\"Asador de pollos\",\"Ice Bucket Challenge\");"
-# cursor.execute(query)
-
-
-# #Hacemos un commit por si acaso.
-# connect.commit()
+    def clear(self):
+        query = "delete from FIELD where 1;"
+        self.cursor.execute(query)
+        self.connect.commit()

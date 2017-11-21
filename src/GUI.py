@@ -27,7 +27,8 @@ class Handler:
                         "on_delete_button_clicked" : self.on_delete_button_clicked,
                         "on_update_button_clicked" : self.on_update_button_clicked,
                         "on_edit_button_clicked" : self.on_edit_button_clicked,
-                        "on_load_button_clicked" : self.on_load_button_clicked
+                        "on_load_button_clicked" : self.on_load_button_clicked,
+                        "on_destroy_button_clicked" : self.on_destroy_button_clicked
                         }
         self.builder.connect_signals(self.handlers)
         self.window = self.builder.get_object("main")
@@ -39,18 +40,24 @@ class Handler:
         self.update_button = self.builder.get_object("update_button")
         self.edit_button = self.builder.get_object("edit_button")
         self.load_button = self.builder.get_object("load_button")
+        self.destroy_button = self.builder.get_object("destroy_button")
+
+        #----------------------------TEXT ENTRY WIDGET------------------
+
+        self.entry1 = self.builder.get_object("entry1")
+        self.entry2 = self.builder.get_object("entry2")
+        self.entry3 = self.builder.get_object("entry3")
+        self.entry4 = self.builder.get_object("entry4")
+        self.entry5 = self.builder.get_object("entry5")        
 
         #----------------------------TREE VIEW MANAGEMENT----------------------------
         
         self.treeView_DB = self.builder.get_object("treeView_DB")
 
-        self.model = Gtk.ListStore(int, str, str, str, str, str)
+        self.select = self.treeView_DB.get_selection()
+        self.select.connect("changed", self.on_tree_selection_changed)
 
-        self.model.append([1,"Working","Working","Working","Working","Working"])
-        self.model.append([2,"Working","Working","Working","Working","Working"])
-        self.model.append([3,"Working","Working","Working","Working","Working"])
-        self.model.append([4,"Working","Working","Working","Working","Working"])
-        self.model.append([5,"Working","Working","Working","Working","Working"])
+        self.model = Gtk.ListStore(int, str, str, str, str, str)
 
         self.treeView_DB.set_model(self.model)
 
@@ -85,30 +92,61 @@ class Handler:
     
     def on_add_button_clicked(self,button):
         if self.DB_initializated:
-            self.DB.addRegister(1,"TESTING","TESTING","TESTING","TESTING","TESTING")
+            if self.entry1.get_text() and self.entry2.get_text() and self.entry3.get_text() and self.entry4.get_text() and self.entry5.get_text() :
+                self.DB.addRegister(self.entry1.get_text(),self.entry2.get_text(),self.entry3.get_text(),self.entry4.get_text(),self.entry5.get_text())
+                self.on_update_button_clicked(button)
+                print("Register added")
+            else:
+                print("Error while adding.")
 
     def on_delete_button_clicked(self,button):
-        print("Delete button")
+        select = self.select.get_selected()
+        self.DB.remove(self.model[select[1]][0])
+        self.model.remove(select[1])
+        print("Register deleted")
     
     def on_update_button_clicked(self,button):
         data = self.DB.getRegisters()
+        for row in self.model:
+            treeIter = self.model.get_iter_first()
+            self.model.remove(treeIter)
         for reg in data:
             self.model.append(reg)
         print("DB updated")        
     
     def on_edit_button_clicked(self,button):
-        print("Edit button")
+        treeIter = self.select.get_selected()[1]
+        if treeIter != None:
+            self.model[treeIter][1]=self.entry1.get_text()
+            self.model[treeIter][2]=self.entry2.get_text()
+            self.model[treeIter][3]=self.entry3.get_text()
+            self.model[treeIter][4]=self.entry4.get_text()
+            self.model[treeIter][5]=self.entry5.get_text()
+            print("Register edited")
     
     def on_load_button_clicked(self, button):
         if not self.DB_initializated:
             self.DB = DBlib.DB_Handler()
             self.DB.openDB(host='localhost', user='antonio', passwd='antonio', db='GUI')
             data = self.DB.getRegisters()
-            print(data)
             for reg in data:
                 self.model.append(reg)
             self.DB_initializated = True
-            print("DB initializated")
+            print("DB loaded")
+
+    def on_destroy_button_clicked(self, button):
+        if self.DB_initializated:
+            self.DB.clear()
+            print("DB cleared")
+
+    def on_tree_selection_changed(self, selection):
+        if selection.get_selected()[1] != None:
+            treeIter = selection.get_selected()[1]
+            self.entry1.set_text(self.model[treeIter][1])
+            self.entry2.set_text(self.model[treeIter][2])
+            self.entry3.set_text(self.model[treeIter][3])
+            self.entry4.set_text(self.model[treeIter][4])
+            self.entry5.set_text(self.model[treeIter][5])
 
 def main():
     window = Handler()
