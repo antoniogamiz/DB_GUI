@@ -2,6 +2,11 @@
 <!-- Generated with glade 3.18.3 -->
 <interface>
   <requires lib="gtk+" version="3.12"/>
+  <object class="GtkAdjustment" id="adjustment2">
+    <property name="upper">10</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
   <object class="GtkWindow" id="main">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">DataBase Management</property>
@@ -171,6 +176,7 @@
           <object class="GtkTreeView" id="treeView_DB">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="vadjustment">adjustment2</property>
             <property name="search_column">4</property>
             <property name="enable_grid_lines">both</property>
             <child internal-child="selection">
@@ -242,11 +248,12 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="button5">
-                <property name="label" translatable="yes">Working</property>
+              <object class="GtkButton" id="load_button">
+                <property name="label" translatable="yes">Cargar</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <signal name="clicked" handler="on_load_button_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">0</property>

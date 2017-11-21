@@ -1,9 +1,11 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 #-*- coding: utf-8 -*-
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+
+import DB_funcionality as DBlib
 
 import os
 os.system("clear")
@@ -14,14 +16,18 @@ os.system("clear")
 class Handler:
     builder=None
     def __init__(self):
+        self.DB_initializated = False
+        #----------------------------GLADE AND SIGNAL INITIALIZATION----------------------------
+        
         self.builder = Gtk.Builder()
-        self.builder.add_from_file("GUI.glade")
+        self.builder.add_from_file("./GUI/GUI.glade")
         self.handlers = {
                         "on_main_destroy" : Gtk.main_quit,
                         "on_add_button_clicked" : self.on_add_button_clicked,
                         "on_delete_button_clicked" : self.on_delete_button_clicked,
                         "on_update_button_clicked" : self.on_update_button_clicked,
-                        "on_edit_button_clicked" : self.on_edit_button_clicked
+                        "on_edit_button_clicked" : self.on_edit_button_clicked,
+                        "on_load_button_clicked" : self.on_load_button_clicked
                         }
         self.builder.connect_signals(self.handlers)
         self.window = self.builder.get_object("main")
@@ -32,7 +38,8 @@ class Handler:
         self.delete_button = self.builder.get_object("delete_button")
         self.update_button = self.builder.get_object("update_button")
         self.edit_button = self.builder.get_object("edit_button")
-    
+        self.load_button = self.builder.get_object("load_button")
+
         #----------------------------TREE VIEW MANAGEMENT----------------------------
         
         self.treeView_DB = self.builder.get_object("treeView_DB")
@@ -71,19 +78,37 @@ class Handler:
         column5 = Gtk.TreeViewColumn("Field 5", renderer5, text=5)
         self.treeView_DB.append_column(column5)
 
+        #----------------------------WINDOW PREFERENCES----------------------------
         self.window.show_all()
 
     #----------------------------CRUD BUTTONS(FUNCTIONS CLICKED)----------------------------
     
     def on_add_button_clicked(self,button):
-        print("Add button")
-        print(self.renderer0.get_alignment())
+        if self.DB_initializated:
+            self.DB.addRegister(1,"TESTING","TESTING","TESTING","TESTING","TESTING")
+
     def on_delete_button_clicked(self,button):
         print("Delete button")
+    
     def on_update_button_clicked(self,button):
-        print("Update button")
+        data = self.DB.getRegisters()
+        for reg in data:
+            self.model.append(reg)
+        print("DB updated")        
+    
     def on_edit_button_clicked(self,button):
         print("Edit button")
+    
+    def on_load_button_clicked(self, button):
+        if not self.DB_initializated:
+            self.DB = DBlib.DB_Handler()
+            self.DB.openDB(host='localhost', user='antonio', passwd='antonio', db='GUI')
+            data = self.DB.getRegisters()
+            print(data)
+            for reg in data:
+                self.model.append(reg)
+            self.DB_initializated = True
+            print("DB initializated")
 
 def main():
     window = Handler()
