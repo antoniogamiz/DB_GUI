@@ -20,19 +20,37 @@ class DB_Handler():
         except:
             return -1
 
-    def getAvailableID(self):
+    def getIDs(self):
         query="select ID from FIELD where 1"
         self.cursor.execute(query)
         ids = self.cursor.fetchall()
 
         ids_=[]
+
         for p in ids:
             ids_.append(p[0])
+
+        return ids_
+
+    def getAvailableID(self):
+        ids=self.getIDs()
+
         i=1
-        while i in ids_:
+        while i in ids:
             i+=1
 
         return i
+
+    def editRegisterWithID(self, *arg):
+        if len(arg)==6:
+            query="update FIELD set "+"field1=\""+arg[1]+"\", "+"field2=\""+arg[2]+"\", "+"field3=\""+arg[3]+"\", "+"field4=\""+arg[4]+"\", "+"field5=\""+arg[5]+"\" where id=\""+str(arg[0])+"\";"
+            self.cursor.execute(query)
+            self.connect.commit()
+
+    def getRegisterWithID(self, id):
+        query="select * from FIELD where id="+str(id)+";"
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
 
     def getRegisters(self):
         query="select * from FIELD where 1;"
