@@ -20,7 +20,7 @@ class Handler:
         #----------------------------GLADE AND SIGNAL INITIALIZATION----------------------------
         
         self.builder = Gtk.Builder()
-        self.builder.add_from_file("./GUI/GUI.glade")
+        self.builder.add_from_file("./GUI/GUI2.glade")
         self.handlers = {
                         "on_main_destroy" : Gtk.main_quit,
                         "on_add_button_clicked" : self.on_add_button_clicked,
@@ -32,6 +32,9 @@ class Handler:
                         }
         self.builder.connect_signals(self.handlers)
         self.window = self.builder.get_object("main")
+
+        self.window_grid = self.builder.get_object("window_grid")
+        self.top_menu = self.builder.get_object("top_menu")
 
         #----------------------------CRUD BUTTONS----------------------------
         
@@ -52,7 +55,14 @@ class Handler:
 
         #----------------------------TREE VIEW MANAGEMENT----------------------------
         
-        self.treeView_DB = self.builder.get_object("treeView_DB")
+        self.treeView_DB = Gtk.TreeView()
+
+        self.scrollable_treelist = Gtk.ScrolledWindow()
+        self.scrollable_treelist.set_vexpand(True)
+        self.scrollable_treelist.set_hexpand(True)
+        self.window_grid.attach(self.scrollable_treelist,0,2,3,5)
+
+        self.scrollable_treelist.add(self.treeView_DB)
 
         self.select = self.treeView_DB.get_selection()
         self.select.connect("changed", self.on_tree_selection_changed)
