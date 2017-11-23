@@ -26,7 +26,7 @@ class Handler:
         #----------------------------INICIALIZACION GLADE----------------------------
         
         self.builder = Gtk.Builder()
-        self.builder.add_from_file("./GUI/GUI3.glade")
+        self.builder.add_from_file("./GUI/GUI.glade")
         self.handlers = {
                         "on_main_destroy" : Gtk.main_quit,
                         "on_add_button_clicked" : self.on_add_button_clicked,
@@ -258,6 +258,7 @@ class Handler:
     def on_clear_button_clicked(self, button):
         if self.DB_initializated:
             self.DB.clear()
+            self.on_update_button_clicked(button)
             print("DB cleared")
         else:
             print("Error: Data Base not initializated")
