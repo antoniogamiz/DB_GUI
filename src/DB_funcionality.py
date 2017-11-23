@@ -16,6 +16,14 @@ class DB_Handler():
             self.user=arg['user']
             self.passwd=arg['passwd']
             self.db=arg['db']
+            
+            try:
+                query="create table FIELD (id int, field1 varchar(100), field2 varchar(100), field3 varchar(100), field4 varchar(100), field5 varchar(100));"
+                print(self.cursor.execute(query))
+                self.connect.commit()
+            except:
+                print("Warning: FIELD table, wich is used by this program, is already created.")
+            
             return 1
         except:
             return -1
